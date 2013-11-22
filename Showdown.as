@@ -978,10 +978,10 @@ package showdown {
 			
 			// <strong> must go first:
 			text = text.replace(/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g,
-				"<strong>$2</strong>");
+				"<b>$2</b>");
 			
 			text = text.replace(/(\*|_)(?=\S)([^\r]*?\S)\1/g,
-				"<em>$2</em>");
+				"<i>$2</i>");
 			
 			return text;
 		}
