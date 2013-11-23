@@ -131,7 +131,9 @@ package showdown {
 
 			// Finally, add a additional newline after each closing P tag, because flash only
 			// outputs one newline per <p></p> tag, apparently flash again feels the need to be a special snowflake
-			text = text.replace(/<\/p>/gi,"</p>\n");
+			// text = text.replace(/<\/p>/gi,"</p>\n");
+			// aaaannnnd now it's properly producing two \n's between paragraphs. WTF, Flash?
+
 
 			return text;
 		}
