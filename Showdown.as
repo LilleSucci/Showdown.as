@@ -122,7 +122,17 @@ package showdown {
 			
 			// attacklab: Restore tildes
 			text = text.replace(/~T/g,"~");
-			
+
+			// unfortunately, because flash is on crack, the "htmlText" window still inserts breaks at "\n" 
+			// characters AS WELL AS <p> tags. Therefore, we remove all the newline tags after parsing to HTML, and before 
+			// trying to display the contents.
+			// FLASH: YOU CRAZY
+			text = text.replace(/\n/g, "")
+
+			// Finally, add a additional newline after each closing P tag, because flash only
+			// outputs one newline per <p></p> tag, apparently flash again feels the need to be a special snowflake
+			text = text.replace(/<\/p>/gi,"</p>\n");
+
 			return text;
 		}
 		
