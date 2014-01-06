@@ -659,10 +659,10 @@ package showdown {
 			//	--------
 			//
 			text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm,
-				function(wholeMatch:String,m1:String):String{return hashBlock("<h1>" + _RunSpanGamut(m1) + "</h1>");});
+				function(wholeMatch:String,m1:String,...args):String{return hashBlock("<h1>" + _RunSpanGamut(m1) + "</h1>");});
 			
 			text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm,
-				function(matchFound:String,m1:String):String{return hashBlock("<h2>" + _RunSpanGamut(m1) + "</h2>");});
+				function(matchFound:String,m1:String,...args):String{return hashBlock("<h2>" + _RunSpanGamut(m1) + "</h2>");});
 			
 			// atx-style headers:
 			//  # Header 1
@@ -684,7 +684,7 @@ package showdown {
 			*/
 			
 			text = text.replace(/^(\#{1,6})[ \t]*(.+?)[ \t]*\#*\n+/gm,
-				function(wholeMatch:String,m1:String,m2:String):String {
+				function(wholeMatch:String,m1:String,m2:String,...args):String {
 					var h_level:int = m1.length;
 					return hashBlock("<h" + h_level + ">" + _RunSpanGamut(m2) + "</h" + h_level + ">");
 				});
@@ -727,7 +727,7 @@ package showdown {
 			var whole_list:RegExp = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
 			
 			if (g_list_level) {
-				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String):String {
+				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String,...args):String {
 					var list:String = m1;
 					var list_type:String = (m2.search(/[*+-]/g)>-1) ? "ul" : "ol";
 					
@@ -746,7 +746,7 @@ package showdown {
 				});
 			} else {
 				whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
-				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String,m3:String):String {
+				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String,m3:String,...args):String {
 					//noinspection UnnecessaryLocalVariableJS
 					var runup:String = m1;
 					var list:String = m2;
@@ -769,7 +769,7 @@ package showdown {
 		
 		private static function _DoTables(text:String):String {
 			text = text.replace(/(?:\|(?:[^\|\r\n]+\|)+\n)+/gm,
-				function(wholeMatch:String):String {
+				function(wholeMatch:String,...args):String {
 					return "<table>" + _DoTableRows(wholeMatch) + "</table>";
 				});
 			return text
@@ -777,7 +777,7 @@ package showdown {
 		
 		private static function _DoTableRows(text:String):String {
 			text = text.replace(/\|((?:[^\|\r\n]+\|)+)\n/gm,
-				function(wholeMatch:String, g1:String):String {
+				function(wholeMatch:String, g1:String,...args):String {
 					return "<tr>" + _DoTableCells(g1) + "</tr>";
 				});
 			return text;
@@ -785,7 +785,7 @@ package showdown {
 		
 		private static function _DoTableCells(text:String):String {
 			text = text.replace(/([^\|\r\n]+)\|/gm,
-				function(wholeMatch:String, g1:String):String {
+				function(wholeMatch:String, g1:String,...args):String {
 					return "<td>" + _RunSpanGamut(g1) + "</td>";
 				});
 			return text;
@@ -985,7 +985,7 @@ package showdown {
 			text = text.replace(/>/g,"&gt;");
 			
 			// Now, escape characters that are magic in Markdown:
-			text = escapeCharacters(text,"\*_{}[]\\",false);
+			text = escapeCharacters(text,"*_{}[]\\",false);
 			
 			// jj the line above breaks this:
 			//---
@@ -1209,7 +1209,7 @@ package showdown {
 			
 			addr = "mailto:" + addr;
 			
-			addr = addr.replace(/./g, function(ch:String):String {
+			addr = addr.replace(/./g, function(ch:String,...args):String {
 				if (ch == "@") {
 					// this *must* be encoded. I insist.
 					ch = encode[Math.floor(Math.random()*2)](ch);
@@ -1238,7 +1238,7 @@ package showdown {
 			// Swap back in all the special characters we've hidden.
 			//
 			text = text.replace(/~E(\d+)E/g,
-				function(wholeMatch:String,m1:String):String {
+				function(wholeMatch:String,m1:String,...args):String {
 					var charCodeToReplace:int = parseInt(m1);
 					return String.fromCharCode(charCodeToReplace);
 				}
@@ -1276,7 +1276,7 @@ package showdown {
 			
 			// use the sentinel to anchor our regex so it doesn't explode
 			text = text.replace(/~B(.+?)~A/g,
-				function(wholeMatch:String,m1:String,m2:*):String {
+				function(wholeMatch:String,m1:String,m2:*,...args):String {
 					var leadingText:String = m1;
 					var numSpaces:int = 4 - leadingText.length % 4;  // attacklab: g_tab_width
 					
