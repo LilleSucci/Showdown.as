@@ -76,9 +76,9 @@ package showdown {
 			// from other articles when generating a page which contains more than
 			// one article (e.g. an index page that shows the N most recent
 			// articles):
-			g_urls = new Array();
-			g_titles = new Array();
-			g_html_blocks = new Array();
+			g_urls = [];
+			g_titles = [];
+			g_html_blocks = [];
 			
 			// attacklab: Replace ~ with ~T
 			// This lets us use tilde as an escape char to avoid md5 hashes
@@ -127,7 +127,7 @@ package showdown {
 			// characters AS WELL AS <p> tags. Therefore, we remove all the newline tags after parsing to HTML, and before 
 			// trying to display the contents.
 			// FLASH: YOU CRAZY
-			text = text.replace(/\n/g, "")
+			text = text.replace(/\n/g, "");
 
 			// Finally, add a additional newline after each closing P tag, because flash only
 			// outputs one newline per <p></p> tag, apparently flash again feels the need to be a special snowflake
@@ -139,7 +139,7 @@ package showdown {
 		}
 		
 		
-		private static function _StripLinkDefinitions(text) {
+		private static function _StripLinkDefinitions(text:String):String {
 			//
 			// Strips link definitions from text, stores the URLs and titles in
 			// hash references.
@@ -168,8 +168,8 @@ package showdown {
 			/gm,
 			function(){...});
 			*/
-			var text = text.replace(/^[ ]{0,3}\[(.+)\]:[ \t]*\n?[ \t]*<?(\S+?)>?[ \t]*\n?[ \t]*(?:(\n*)["(](.+?)[")][ \t]*)?(?:\n+|\Z)/gm,
-				function (wholeMatch,m1,m2,m3,m4) {
+			text = text.replace(/^[ ]{0,3}\[(.+)\]:[ \t]*\n?[ \t]*<?(\S+?)>?[ \t]*\n?[ \t]*(?:(\n*)["(](.+?)[")][ \t]*)?(?:\n+|\Z)/gm,
+				function (wholeMatch:String,m1:*,m2:*,m3:*,m4:*,...args):String {
 					m1 = m1.toLowerCase();
 					g_urls[m1] = _EncodeAmpsAndAngles(m2);  // Link IDs are case-insensitive
 					if (m3) {
@@ -189,7 +189,7 @@ package showdown {
 		}
 		
 		
-		private static function _HashHTMLBlocks(text) {
+		private static function _HashHTMLBlocks(text:String):String {
 			// attacklab: Double up blank lines to reduce lookaround
 			text = text.replace(/\n/g,"\n\n");
 			
@@ -199,8 +199,10 @@ package showdown {
 			// "paragraphs" that are wrapped in non-block-level tags, such as anchors,
 			// phrase emphasis, and spans. The list of tags we're looking for is
 			// hard-coded:
-			var block_tags_a = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del"
-			var block_tags_b = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math"
+			//noinspection JSUnusedLocalSymbols
+			var block_tags_a:String = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del";
+			//noinspection JSUnusedLocalSymbols
+			var block_tags_b:String = "p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math";
 			
 			// First, look for nested blocks, e.g.:
 			//   <div>
@@ -313,9 +315,10 @@ package showdown {
 			text = text.replace(/\n\n/g,"\n");
 			return text;
 		}
-		
-		private static function hashElement(wholeMatch,m1,m2,m3,m4) {
-			var blockText = m1;
+
+		//noinspection JSUnusedLocalSymbols
+		private static function hashElement(wholeMatch:String,m1:*,m2:*,m3:*,m4:*,...args):String {
+			var blockText:String = m1;
 			
 			// Undo double lines
 			blockText = blockText.replace(/\n\n/g,"\n");
@@ -328,9 +331,9 @@ package showdown {
 			blockText = "\n\n~K" + (g_html_blocks.push(blockText)-1) + "K\n\n";
 			
 			return blockText;
-		};
+		}
 		
-		private static function _RunBlockGamut(text) {
+		private static function _RunBlockGamut(text:String):String {
 			//
 			// These are all the transformations that form block-level
 			// tags like paragraphs, headers, and list items.
@@ -338,7 +341,7 @@ package showdown {
 			text = _DoHeaders(text);
 			
 			// Do Horizontal Rules:
-			var key = hashBlock("<hr />");
+			var key:String = hashBlock("<hr />");
 			text = text.replace(/^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$/gm,key);
 			text = text.replace(/^[ ]{0,2}([ ]?\-[ ]?){3,}[ \t]*$/gm,key);
 			text = text.replace(/^[ ]{0,2}([ ]?\_[ ]?){3,}[ \t]*$/gm,key);
@@ -359,7 +362,7 @@ package showdown {
 		}
 		
 		
-		private static function _RunSpanGamut(text) {
+		private static function _RunSpanGamut(text:String):String {
 			//
 			// These are all the transformations that occur *within* block-level
 			// tags like paragraphs, headers, and list items.
@@ -387,7 +390,7 @@ package showdown {
 			return text;
 		}
 		
-		private static function _EscapeSpecialCharsWithinTagAttributes(text) {
+		private static function _EscapeSpecialCharsWithinTagAttributes(text:String):String {
 			//
 			// Within tags -- meaning between < and > -- encode [\ ` * _] so they
 			// don't conflict with their use in Markdown for code, italics and strong.
@@ -395,10 +398,10 @@ package showdown {
 			
 			// Build a regex to find HTML tags and comments.  See Friedl's 
 			// "Mastering Regular Expressions", 2nd Ed., pp. 200-201.
-			var regex = /(<[a-z\/!$]("[^"]*"|'[^']*'|[^'">])*>|<!(--.*?--\s*)+>)/gi;
+			var regex:RegExp = /(<[a-z\/!$]("[^"]*"|'[^']*'|[^'">])*>|<!(--.*?--\s*)+>)/gi;
 			
-			text = text.replace(regex, function(wholeMatch) {
-				var tag = wholeMatch.replace(/(.)<\/?code>(?=.)/g,"$1`");
+			text = text.replace(regex, function(wholeMatch:String,...args):String {
+				var tag:String = wholeMatch.replace(/(.)<\/?code>(?=.)/g,"$1`");
 				tag = escapeCharacters(tag,"\\`*_");
 				return tag;
 			});
@@ -406,7 +409,7 @@ package showdown {
 			return text;
 		}
 		
-		private static function _DoAnchors(text) {
+		private static function _DoAnchors(text:String):String {
 			//
 			// Turn Markdown link shortcuts into XHTML <a> tags.
 			//
@@ -490,14 +493,17 @@ package showdown {
 			
 			return text;
 		}
-		
-		private static function writeAnchorTag(wholeMatch,m1,m2,m3,m4,m5,m6,m7,m8,m9) {
+
+		//noinspection JSUnusedLocalSymbols
+		private static function writeAnchorTag(wholeMatch:String,m1:*,m2:*,m3:*,m4:*,m5:*,m6:*,m7:*,m8:*,m9:*,...args):String {
 			if (m7 == undefined) m7 = "";
-			var whole_match = m1;
-			var link_text   = m2;
-			var link_id	 = m3.toLowerCase();
-			var url		= m4;
-			var title	= m7;
+			//noinspection UnnecessaryLocalVariableJS
+			var whole_match:String = m1;
+			//noinspection UnnecessaryLocalVariableJS
+			var link_text:String   = m2;
+			var link_id:String	 = m3.toLowerCase();
+			var url:String		= m4;
+			var title:String	= m7;
 			
 			if (url == "") {
 				if (link_id == "") {
@@ -523,7 +529,7 @@ package showdown {
 			}	
 			
 			url = escapeCharacters(url,"*_");
-			var result = "<a href=\"" + url + "\"";
+			var result:String = "<a href=\"" + url + "\"";
 			
 			if (title != "") {
 				title = title.replace(/"/g,"&quot;");
@@ -537,7 +543,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoImages(text) {
+		private static function _DoImages(text:String):String {
 			//
 			// Turn Markdown image shortcuts into <img> tags.
 			//
@@ -594,13 +600,15 @@ package showdown {
 			
 			return text;
 		}
-		
-		private static function writeImageTag(wholeMatch,m1,m2,m3,m4,m5,m6,m7,m8,m9) {
-			var whole_match = m1;
-			var alt_text   = m2;
-			var link_id	 = m3.toLowerCase();
-			var url		= m4;
-			var title	= m7;
+
+		//noinspection JSUnusedLocalSymbols
+		private static function writeImageTag(wholeMatch:String,m1:*,m2:*,m3:*,m4:*,m5:*,m6:*,m7:*,m8:*,m9:*):String {
+			//noinspection UnnecessaryLocalVariableJS
+			var whole_match:String = m1;
+			var alt_text:String   = m2;
+			var link_id:String	 = m3.toLowerCase();
+			var url:String		= m4;
+			var title:String	= m7;
 			
 			if (!title) title = "";
 			
@@ -624,7 +632,7 @@ package showdown {
 			
 			alt_text = alt_text.replace(/"/g,"&quot;");
 			url = escapeCharacters(url,"*_");
-			var result = "<img src=\"" + url + "\" alt=\"" + alt_text + "\"";
+			var result:String = "<img src=\"" + url + "\" alt=\"" + alt_text + "\"";
 			
 			// attacklab: Markdown.pl adds empty title attributes to images.
 			// Replicate this bug.
@@ -641,7 +649,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoHeaders(text:String) {
+		private static function _DoHeaders(text:String):String {
 			
 			// Setext-style headers:
 			//	Header 1
@@ -651,10 +659,10 @@ package showdown {
 			//	--------
 			//
 			text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm,
-				function(wholeMatch,m1){return hashBlock("<h1>" + _RunSpanGamut(m1) + "</h1>");});
+				function(wholeMatch:String,m1:String,...args):String{return hashBlock("<h1>" + _RunSpanGamut(m1) + "</h1>");});
 			
 			text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm,
-				function(matchFound,m1){return hashBlock("<h2>" + _RunSpanGamut(m1) + "</h2>");});
+				function(matchFound:String,m1:String,...args):String{return hashBlock("<h2>" + _RunSpanGamut(m1) + "</h2>");});
 			
 			// atx-style headers:
 			//  # Header 1
@@ -676,15 +684,15 @@ package showdown {
 			*/
 			
 			text = text.replace(/^(\#{1,6})[ \t]*(.+?)[ \t]*\#*\n+/gm,
-				function(wholeMatch,m1,m2) {
-					var h_level = m1.length;
+				function(wholeMatch:String,m1:String,m2:String,...args):String {
+					var h_level:int = m1.length;
 					return hashBlock("<h" + h_level + ">" + _RunSpanGamut(m2) + "</h" + h_level + ">");
 				});
 			
 			return text;
 		}
 		
-		private static function _DoLists(text) {
+		private static function _DoLists(text:String):String {
 			//
 			// Form HTML ordered (numbered) and unordered (bulleted) lists.
 			//
@@ -716,17 +724,17 @@ package showdown {
 			)
 			)/g
 			*/
-			var whole_list = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
+			var whole_list:RegExp = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
 			
 			if (g_list_level) {
-				text = text.replace(whole_list,function(wholeMatch,m1,m2) {
-					var list = m1;
-					var list_type = (m2.search(/[*+-]/g)>-1) ? "ul" : "ol";
+				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String,...args):String {
+					var list:String = m1;
+					var list_type:String = (m2.search(/[*+-]/g)>-1) ? "ul" : "ol";
 					
 					// Turn double returns into triple returns, so that we can make a
 					// paragraph for the last item in a list, if necessary:
-					list = list.replace(/\n{2,}/g,"\n\n\n");;
-					var result = _ProcessListItems(list);
+					list = list.replace(/\n{2,}/g,"\n\n\n");
+					var result:String = _ProcessListItems(list);
 					
 					// Trim any trailing whitespace, to put the closing `</$list_type>`
 					// up on the preceding line, to get it past the current stupid
@@ -738,15 +746,16 @@ package showdown {
 				});
 			} else {
 				whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
-				text = text.replace(whole_list,function(wholeMatch,m1,m2,m3) {
-					var runup = m1;
-					var list = m2;
+				text = text.replace(whole_list,function(wholeMatch:String,m1:String,m2:String,m3:String,...args):String {
+					//noinspection UnnecessaryLocalVariableJS
+					var runup:String = m1;
+					var list:String = m2;
 					
-					var list_type = (m3.search(/[*+-]/g)>-1) ? "ul" : "ol";
+					var list_type:String = (m3.search(/[*+-]/g)>-1) ? "ul" : "ol";
 					// Turn double returns into triple returns, so that we can make a
 					// paragraph for the last item in a list, if necessary:
-					list = list.replace(/\n{2,}/g,"\n\n\n");;
-					var result = _ProcessListItems(list);
+					list = list.replace(/\n{2,}/g,"\n\n\n");
+					var result:String = _ProcessListItems(list);
 					result = runup + "<"+list_type+">\n" + result + "</"+list_type+">\n";	
 					return result;
 				});
@@ -758,31 +767,31 @@ package showdown {
 			return text;
 		}
 		
-		private static function _DoTables(text) {
+		private static function _DoTables(text:String):String {
 			text = text.replace(/(?:\|(?:[^\|\r\n]+\|)+\n)+/gm,
-				function(wholeMatch) {
+				function(wholeMatch:String,...args):String {
 					return "<table>" + _DoTableRows(wholeMatch) + "</table>";
 				});
 			return text
 		}
 		
-		private static function _DoTableRows(text) {
+		private static function _DoTableRows(text:String):String {
 			text = text.replace(/\|((?:[^\|\r\n]+\|)+)\n/gm,
-				function(wholeMatch, g1) {
+				function(wholeMatch:String, g1:String,...args):String {
 					return "<tr>" + _DoTableCells(g1) + "</tr>";
 				});
 			return text;
 		}
 		
-		private static function _DoTableCells(text) {
+		private static function _DoTableCells(text:String):String {
 			text = text.replace(/([^\|\r\n]+)\|/gm,
-				function(wholeMatch, g1) {
+				function(wholeMatch:String, g1:String,...args):String {
 					return "<td>" + _RunSpanGamut(g1) + "</td>";
 				});
 			return text;
 		}
 		
-		private static function _ProcessListItems(list_str) {
+		private static function _ProcessListItems(list_str:String):String {
 			//
 			//  Process the contents of a single ordered or unordered list, splitting it
 			//  into individual list items.
@@ -827,10 +836,12 @@ package showdown {
 			/gm, function(){...});
 			*/
 			list_str = list_str.replace(/(\n)?(^[ \t]*)([*+-]|\d+[.])[ \t]+([^\r]+?(\n{1,2}))(?=\n*(~0|\2([*+-]|\d+[.])[ \t]+))/gm,
-				function(wholeMatch,m1,m2,m3,m4){
-					var item = m4;
-					var leading_line = m1;
-					var leading_space = m2;
+				function(wholeMatch:String,m1:String,m2:String,m3:String,m4:String,...args):String{
+					var item:String = m4;
+					//noinspection UnnecessaryLocalVariableJS
+					var leading_line:String = m1;
+					//noinspection JSUnusedLocalSymbols
+					var leading_space:String = m2;
 					
 					if (leading_line || (item.search(/\n{2,}/)>-1)) {
 						item = _RunBlockGamut(_Outdent(item));
@@ -854,7 +865,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoCodeBlocks(text:String) {
+		private static function _DoCodeBlocks(text:String):String {
 			//
 			//  Process Markdown `<pre><code>` blocks.
 			//  
@@ -876,9 +887,10 @@ package showdown {
 			text += "~0";
 			
 			text = text.replace(/(?:\n\n|^)((?:(?:[ ]{4}|\t).*\n+)+)(\n*[ ]{0,3}[^ \t\n]|(?=~0))/g,
-				function(wholeMatch,m1,m2) {
-					var codeblock = m1;
-					var nextChar = m2;
+				function(wholeMatch:String,m1:String,m2:String,...args):String {
+					var codeblock:String = m1;
+					//noinspection UnnecessaryLocalVariableJS
+					var nextChar:String = m2;
 					
 					codeblock = _EncodeCode( _Outdent(codeblock));
 					codeblock = _Detab(codeblock);
@@ -898,14 +910,15 @@ package showdown {
 			
 			return text;
 		}
-		
-		private static function hashBlock(text) {
+
+		//noinspection JSUnusedLocalSymbols
+		private static function hashBlock(text:String,...args):String {
 			text = text.replace(/(^\n+|\n+$)/g,"");
 			return "\n\n~K" + (g_html_blocks.push(text)-1) + "K\n\n";
 		}
 		
 		
-		private static function _DoCodeSpans(text:String) {
+		private static function _DoCodeSpans(text:String):String {
 			//
 			//   *  Backtick quotes are used for <code></code> spans.
 			// 
@@ -945,8 +958,8 @@ package showdown {
 			*/
 			
 			text = text.replace(/(^|[^\\])(`+)([^\r]*?[^`])\2(?!`)/gm,
-				function(wholeMatch,m1,m2,m3,m4) {
-					var c = m3;
+				function(wholeMatch:String,m1:*,m2:*,m3:*,m4:*,...args):String {
+					var c:String = m3;
 					c = c.replace(/^([ \t]*)/g,"");	// leading whitespace
 					c = c.replace(/[ \t]*$/g,"");	// trailing whitespace
 					c = _EncodeCode(c);
@@ -957,7 +970,7 @@ package showdown {
 		}
 		
 		
-		private static function _EncodeCode(text:String) {
+		private static function _EncodeCode(text:String):String {
 			//
 			// Encode/escape certain characters inside Markdown code runs.
 			// The point is that in code, these characters are literals,
@@ -972,7 +985,7 @@ package showdown {
 			text = text.replace(/>/g,"&gt;");
 			
 			// Now, escape characters that are magic in Markdown:
-			text = escapeCharacters(text,"\*_{}[]\\",false);
+			text = escapeCharacters(text,"*_{}[]\\",false);
 			
 			// jj the line above breaks this:
 			//---
@@ -988,7 +1001,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoItalicsAndBold(text:String) {
+		private static function _DoItalicsAndBold(text:String):String {
 			
 			// <strong> must go first:
 			text = text.replace(/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g,
@@ -1001,7 +1014,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoBlockQuotes(text:String) {
+		private static function _DoBlockQuotes(text:String):String {
 			
 			/*
 			text = text.replace(/
@@ -1017,8 +1030,8 @@ package showdown {
 			*/
 			
 			text = text.replace(/((^[ \t]*>[ \t]?.+\n(.+\n)*\n*)+)/gm,
-				function(wholeMatch,m1) {
-					var bq = m1;
+				function(wholeMatch:String,m1:*,...args):String {
+					var bq:String = m1;
 					
 					// attacklab: hack around Konqueror 3.5.4 bug:
 					// "----------bug".replace(/^-/g,"") == "bug"
@@ -1035,8 +1048,8 @@ package showdown {
 					// These leading spaces screw with <pre> content, so we need to fix that:
 					bq = bq.replace(
 						/(\s*<pre>[^\r]+?<\/pre>)/gm,
-						function(wholeMatch,m1) {
-							var pre = m1;
+						function(wholeMatch:String,m1:String,...args):String {
+							var pre:String = m1;
 							// attacklab: hack around Konqueror 3.5.4 bug:
 							pre = pre.replace(/^  /mg,"~0");
 							pre = pre.replace(/~0/g,"");
@@ -1049,7 +1062,7 @@ package showdown {
 		}
 		
 		
-		private static function _FormParagraphs(text:String) {
+		private static function _FormParagraphs(text:String):String {
 			//
 			//  Params:
 			//    $text - string to process with html <p> tags
@@ -1060,13 +1073,13 @@ package showdown {
 			text = text.replace(/\n+$/g,"");
 			
 			var grafs:Array = text.split(/\n{2,}/g);
-			var grafsOut:Array = new Array();
+			var grafsOut:Array = [];
 			
 			//
 			// Wrap <p> tags.
 			//
 			var i:Number;
-			var end = grafs.length;
+			var end:int = grafs.length;
 			for (i=0; i<end; i++) {
 				var str:String = grafs[i];
 				
@@ -1077,7 +1090,7 @@ package showdown {
 				else if (str.search(/\S/) >= 0) {
 					str = _RunSpanGamut(str);
 					str = str.replace(/^([ \t]*)/g,"<p>");
-					str += "</p>"
+					str += "</p>";
 					grafsOut.push(str);
 				}
 				
@@ -1091,7 +1104,7 @@ package showdown {
 				// if this is a marker for an html block...
 				while (grafsOut[i].search(/~K(\d+)K/) >= 0) {
 					var firstGroup:String = (/~K(\d+)K/).exec(grafsOut[i])[1];
-					var blockText = g_html_blocks[firstGroup];
+					var blockText:String = g_html_blocks[firstGroup];
 					blockText = blockText.replace(/\$/g,"$$$$"); // Escape any dollar signs
 					grafsOut[i] = grafsOut[i].replace(/~K\d+K/,blockText);
 				}
@@ -1101,7 +1114,7 @@ package showdown {
 		}
 		
 		
-		private static function _EncodeAmpsAndAngles(text:String) {
+		private static function _EncodeAmpsAndAngles(text:String):String {
 			// Smart processing for ampersands and angle brackets that need to be encoded.
 			
 			// Ampersand-encoding based entirely on Nat Irons's Amputator MT plugin:
@@ -1115,7 +1128,7 @@ package showdown {
 		}
 		
 		
-		private static function _EncodeBackslashEscapes(text:String) {
+		private static function _EncodeBackslashEscapes(text:String):String {
 			//
 			//   Parameter:  String.
 			//   Returns:	The string, with after processing the following backslash
@@ -1137,7 +1150,7 @@ package showdown {
 		}
 		
 		
-		private static function _DoAutoLinks(text:String) {
+		private static function _DoAutoLinks(text:String):String {
 			
 			text = text.replace(/<((https?|ftp|dict):[^'">\s]+)>/gi,"<a href=\"$1\">$1</a>");
 			
@@ -1156,7 +1169,7 @@ package showdown {
 			/gi, _DoAutoLinks_callback());
 			*/
 			text = text.replace(/<(?:mailto:)?([-.\w]+\@[-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+)>/gi,
-				function(wholeMatch,m1) {
+				function(wholeMatch:String,m1:*,...args):String {
 					return _EncodeEmailAddress( _UnescapeSpecialChars(m1) );
 				}
 			);
@@ -1165,7 +1178,7 @@ package showdown {
 		}
 		
 		
-		private static function _EncodeEmailAddress(addr:String) {
+		private static function _EncodeEmailAddress(addr:String):String {
 			//
 			//  Input: an email address, e.g. "foo@example.com"
 			//
@@ -1182,27 +1195,27 @@ package showdown {
 			//
 			
 			// attacklab: why can't javascript speak hex?
-			function char2hex(ch:String) {
-				var hexDigits = '0123456789ABCDEF';
-				var dec = ch.charCodeAt(0);
+			function char2hex(ch:String):String {
+				var hexDigits:String = '0123456789ABCDEF';
+				var dec:int = ch.charCodeAt(0);
 				return(hexDigits.charAt(dec>>4) + hexDigits.charAt(dec&15));
 			}
 			
-			var encode = [
-				function(ch){return "&#"+ch.charCodeAt(0)+";";},
-				function(ch){return "&#x"+char2hex(ch)+";";},
-				function(ch){return ch;}
+			var encode:Array = [
+				function(ch:String):String{return "&#"+ch.charCodeAt(0)+";";},
+				function(ch:String):String{return "&#x"+char2hex(ch)+";";},
+				function(ch:String):String{return ch;}
 			];
 			
 			addr = "mailto:" + addr;
 			
-			addr = addr.replace(/./g, function(ch) {
+			addr = addr.replace(/./g, function(ch:String,...args):String {
 				if (ch == "@") {
 					// this *must* be encoded. I insist.
 					ch = encode[Math.floor(Math.random()*2)](ch);
 				} else if (ch !=":") {
 					// leave ':' alone (to spot mailto: later)
-					var r = Math.random();
+					var r:Number = Math.random();
 					// roughly 10% raw, 45% hex, 45% dec
 					ch =  (
 						r > .9  ?	encode[2](ch)   :
@@ -1220,13 +1233,13 @@ package showdown {
 		}
 		
 		
-		private static function _UnescapeSpecialChars(text:String) {
+		private static function _UnescapeSpecialChars(text:String):String {
 			//
 			// Swap back in all the special characters we've hidden.
 			//
 			text = text.replace(/~E(\d+)E/g,
-				function(wholeMatch,m1) {
-					var charCodeToReplace = parseInt(m1);
+				function(wholeMatch:String,m1:String,...args):String {
+					var charCodeToReplace:int = parseInt(m1);
 					return String.fromCharCode(charCodeToReplace);
 				}
 			);
@@ -1234,7 +1247,7 @@ package showdown {
 		}
 		
 		
-		private static function _Outdent(text:String) {
+		private static function _Outdent(text:String):String {
 			//
 			// Remove one level of line-leading tabs or spaces
 			//
@@ -1245,12 +1258,12 @@ package showdown {
 			text = text.replace(/^(\t|[ ]{1,4})/gm,"~0"); // attacklab: g_tab_width
 			
 			// attacklab: clean up hack
-			text = text.replace(/~0/g,"")
+			text = text.replace(/~0/g,"");
 			
 			return text;
 		}
 		
-		private static function _Detab(text:String) {
+		private static function _Detab(text:String):String {
 			// attacklab: Detab's completely rewritten for speed.
 			// In perl we could fix it by anchoring the regexp with \G.
 			// In javascript we're less fortunate.
@@ -1263,12 +1276,12 @@ package showdown {
 			
 			// use the sentinel to anchor our regex so it doesn't explode
 			text = text.replace(/~B(.+?)~A/g,
-				function(wholeMatch,m1,m2) {
-					var leadingText = m1;
-					var numSpaces = 4 - leadingText.length % 4;  // attacklab: g_tab_width
+				function(wholeMatch:String,m1:String,m2:*,...args):String {
+					var leadingText:String = m1;
+					var numSpaces:int = 4 - leadingText.length % 4;  // attacklab: g_tab_width
 					
 					// there *must* be a better way to do this:
-					for (var i=0; i<numSpaces; i++) leadingText+=" ";
+					for (var i:int=0; i<numSpaces; i++) leadingText+=" ";
 					
 					return leadingText;
 				}
@@ -1287,23 +1300,24 @@ package showdown {
 		//
 		
 		
-		private static function escapeCharacters(text:String, charsToEscape, afterBackslash = false):String {
+		private static function escapeCharacters(text:String, charsToEscape:String, afterBackslash:Boolean = false):String {
 			// First we have to escape the escape characters so that
 			// we can build a character class out of them
-			var regexString = "([" + charsToEscape.replace(/([\[\]\\])/g,"\\$1") + "])";
+			var regexString:String = "([" + charsToEscape.replace(/([\[\]\\])/g,"\\$1") + "])";
 			
 			if (afterBackslash) {
 				regexString = "\\\\" + regexString;
 			}
 			
-			var regex = new RegExp(regexString,"g");
+			var regex:RegExp = new RegExp(regexString,"g");
 			text = text.replace(regex,escapeCharacters_callback);
 			
 			return text;
 		}
-		
-		private static function escapeCharacters_callback(wholeMatch,m1,m2,m3) {
-			var charCodeToEscape = m1.charCodeAt(0);
+
+		//noinspection JSUnusedLocalSymbols
+		private static function escapeCharacters_callback(wholeMatch:String,m1:*,m2:*,m3:*,...args):String {
+			var charCodeToEscape:int = m1.charCodeAt(0);
 			return "~E"+charCodeToEscape+"E";
 		}
 	}// end of Showdown.converter
